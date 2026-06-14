@@ -36,7 +36,7 @@ jobs:
       # ══════════════════════════════════════════════════════════
       #  TEST 1 — Single rectangle
       # ══════════════════════════════════════════════════════════
-      - name: "Test 1 - Single rectangle (20 pts)"
+      - name: "Test 1 - Single rectangle (2 pts)"
         id: test1
         run: |
           INPUT="1
@@ -59,7 +59,7 @@ jobs:
 
           if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "PASS"
-            echo "points=20" >> $GITHUB_OUTPUT
+            echo "points=2" >> $GITHUB_OUTPUT
           else
             echo "FAIL"
             echo "--- Expected ---"
@@ -73,7 +73,7 @@ jobs:
       # ══════════════════════════════════════════════════════════
       #  TEST 2 — Single circle
       # ══════════════════════════════════════════════════════════
-      - name: "Test 2 - Single circle (20 pts)"
+      - name: "Test 2 - Single circle (2 pts)"
         id: test2
         run: |
           INPUT="1
@@ -95,7 +95,7 @@ jobs:
 
           if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "PASS"
-            echo "points=20" >> $GITHUB_OUTPUT
+            echo "points=2" >> $GITHUB_OUTPUT
           else
             echo "FAIL"
             echo "--- Expected ---"
@@ -109,7 +109,7 @@ jobs:
       # ══════════════════════════════════════════════════════════
       #  TEST 3 — Mixed shapes
       # ══════════════════════════════════════════════════════════
-      - name: "Test 3 - Mixed shapes (20 pts)"
+      - name: "Test 3 - Mixed shapes (2 pts)"
         id: test3
         run: |
           INPUT="3
@@ -155,7 +155,7 @@ jobs:
 
           if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "PASS"
-            echo "points=20" >> $GITHUB_OUTPUT
+            echo "points=2" >> $GITHUB_OUTPUT
           else
             echo "FAIL"
             echo "--- Expected ---"
@@ -169,7 +169,7 @@ jobs:
       # ══════════════════════════════════════════════════════════
       #  TEST 4 — Rectangles only
       # ══════════════════════════════════════════════════════════
-      - name: "Test 4 - Rectangles only (20 pts)"
+      - name: "Test 4 - Rectangles only (2 pts)"
         id: test4
         run: |
           INPUT="2
@@ -204,7 +204,7 @@ jobs:
 
           if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "PASS"
-            echo "points=20" >> $GITHUB_OUTPUT
+            echo "points=2" >> $GITHUB_OUTPUT
           else
             echo "FAIL"
             echo "--- Expected ---"
@@ -218,7 +218,7 @@ jobs:
       # ══════════════════════════════════════════════════════════
       #  TEST 5 — Large values
       # ══════════════════════════════════════════════════════════
-      - name: "Test 5 - Large values (20 pts)"
+      - name: "Test 5 - Large values (2 pts)"
         id: test5
         run: |
           INPUT="2
@@ -252,7 +252,7 @@ jobs:
 
           if [ "$ACTUAL" = "$EXPECTED" ]; then
             echo "PASS"
-            echo "points=20" >> $GITHUB_OUTPUT
+            echo "points=2" >> $GITHUB_OUTPUT
           else
             echo "FAIL"
             echo "--- Expected ---"
