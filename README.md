@@ -21,6 +21,10 @@ Rafi realizes he needs an **abstract class** called `Shape` that enforces a cont
 
 ## UML Class Diagram
 
+**Sample**
+<img width="1472" height="1138" alt="image" src="https://github.com/user-attachments/assets/b8db9125-3e84-4103-9c0f-88b79c79bf94" />
+
+
 ```
 +------------------------------------------+
 |              <<abstract>>                |
