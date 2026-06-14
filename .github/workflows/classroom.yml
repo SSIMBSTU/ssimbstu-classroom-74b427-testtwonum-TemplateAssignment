@@ -1,0 +1,286 @@
+name: Autograding
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  autograding:
+    name: Run all tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Java setup ─────────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+
+      # ── 3. Compile ────────────────────────────────────────────
+      - name: Compile source files
+        run: |
+          mkdir -p out
+          javac -d out \
+            src/shapes/Shape.java \
+            src/shapes/Rectangle.java \
+            src/shapes/Circle.java \
+            src/shapes/ShapeMain.java
+
+      # ══════════════════════════════════════════════════════════
+      #  TEST 1 — Single rectangle
+      # ══════════════════════════════════════════════════════════
+      - name: "Test 1 - Single rectangle (20 pts)"
+        id: test1
+        run: |
+          INPUT="1
+          RECTANGLE
+          Red true
+          5.0 8.0"
+
+          EXPECTED="[ Rectangle ]
+          Color : Red
+          Filled: Yes
+          Width : 5.0
+          Length: 8.0
+          Area      : 40.00
+          Perimeter : 26.00
+
+          --- Downcast Check ---
+          Rectangle width=5.0 length=8.0"
+
+          ACTUAL=$(echo "$INPUT" | java -cp out shapes.ShapeMain)
+
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
+            echo "PASS"
+            echo "points=20" >> $GITHUB_OUTPUT
+          else
+            echo "FAIL"
+            echo "--- Expected ---"
+            echo "$EXPECTED"
+            echo "--- Actual ---"
+            echo "$ACTUAL"
+            echo "points=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ══════════════════════════════════════════════════════════
+      #  TEST 2 — Single circle
+      # ══════════════════════════════════════════════════════════
+      - name: "Test 2 - Single circle (20 pts)"
+        id: test2
+        run: |
+          INPUT="1
+          CIRCLE
+          Blue false
+          7.0"
+
+          EXPECTED="[ Circle ]
+          Color : Blue
+          Filled: No
+          Radius: 7.0
+          Area         : 153.94
+          Circumference: 43.98
+
+          --- Downcast Check ---
+          Circle radius=7.0"
+
+          ACTUAL=$(echo "$INPUT" | java -cp out shapes.ShapeMain)
+
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
+            echo "PASS"
+            echo "points=20" >> $GITHUB_OUTPUT
+          else
+            echo "FAIL"
+            echo "--- Expected ---"
+            echo "$EXPECTED"
+            echo "--- Actual ---"
+            echo "$ACTUAL"
+            echo "points=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ══════════════════════════════════════════════════════════
+      #  TEST 3 — Mixed shapes
+      # ══════════════════════════════════════════════════════════
+      - name: "Test 3 - Mixed shapes (20 pts)"
+        id: test3
+        run: |
+          INPUT="3
+          RECTANGLE
+          Green true
+          4.0 9.0
+          CIRCLE
+          Yellow false
+          3.5
+          RECTANGLE
+          Black false
+          10.0 2.5"
+
+          EXPECTED="[ Rectangle ]
+          Color : Green
+          Filled: Yes
+          Width : 4.0
+          Length: 9.0
+          Area      : 36.00
+          Perimeter : 26.00
+
+          [ Circle ]
+          Color : Yellow
+          Filled: No
+          Radius: 3.5
+          Area         : 38.48
+          Circumference: 21.99
+
+          [ Rectangle ]
+          Color : Black
+          Filled: No
+          Width : 10.0
+          Length: 2.5
+          Area      : 25.00
+          Perimeter : 25.00
+
+          --- Downcast Check ---
+          Rectangle width=4.0 length=9.0
+          Circle radius=3.5
+          Rectangle width=10.0 length=2.5"
+
+          ACTUAL=$(echo "$INPUT" | java -cp out shapes.ShapeMain)
+
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
+            echo "PASS"
+            echo "points=20" >> $GITHUB_OUTPUT
+          else
+            echo "FAIL"
+            echo "--- Expected ---"
+            echo "$EXPECTED"
+            echo "--- Actual ---"
+            echo "$ACTUAL"
+            echo "points=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ══════════════════════════════════════════════════════════
+      #  TEST 4 — Rectangles only
+      # ══════════════════════════════════════════════════════════
+      - name: "Test 4 - Rectangles only (20 pts)"
+        id: test4
+        run: |
+          INPUT="2
+          RECTANGLE
+          White true
+          6.0 6.0
+          RECTANGLE
+          Purple false
+          1.5 12.0"
+
+          EXPECTED="[ Rectangle ]
+          Color : White
+          Filled: Yes
+          Width : 6.0
+          Length: 6.0
+          Area      : 36.00
+          Perimeter : 24.00
+
+          [ Rectangle ]
+          Color : Purple
+          Filled: No
+          Width : 1.5
+          Length: 12.0
+          Area      : 18.00
+          Perimeter : 27.00
+
+          --- Downcast Check ---
+          Rectangle width=6.0 length=6.0
+          Rectangle width=1.5 length=12.0"
+
+          ACTUAL=$(echo "$INPUT" | java -cp out shapes.ShapeMain)
+
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
+            echo "PASS"
+            echo "points=20" >> $GITHUB_OUTPUT
+          else
+            echo "FAIL"
+            echo "--- Expected ---"
+            echo "$EXPECTED"
+            echo "--- Actual ---"
+            echo "$ACTUAL"
+            echo "points=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ══════════════════════════════════════════════════════════
+      #  TEST 5 — Large values
+      # ══════════════════════════════════════════════════════════
+      - name: "Test 5 - Large values (20 pts)"
+        id: test5
+        run: |
+          INPUT="2
+          CIRCLE
+          Orange true
+          100.0
+          RECTANGLE
+          Gray true
+          999.9 888.8"
+
+          EXPECTED="[ Circle ]
+          Color : Orange
+          Filled: Yes
+          Radius: 100.0
+          Area         : 31415.93
+          Circumference: 628.32
+
+          [ Rectangle ]
+          Color : Gray
+          Filled: Yes
+          Width : 999.9
+          Length: 888.8
+          Area      : 888711.12
+          Perimeter : 3777.40
+
+          --- Downcast Check ---
+          Circle radius=100.0
+          Rectangle width=999.9 length=888.8"
+
+          ACTUAL=$(echo "$INPUT" | java -cp out shapes.ShapeMain)
+
+          if [ "$ACTUAL" = "$EXPECTED" ]; then
+            echo "PASS"
+            echo "points=20" >> $GITHUB_OUTPUT
+          else
+            echo "FAIL"
+            echo "--- Expected ---"
+            echo "$EXPECTED"
+            echo "--- Actual ---"
+            echo "$ACTUAL"
+            echo "points=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ══════════════════════════════════════════════════════════
+      #  SCORE SUMMARY
+      # ══════════════════════════════════════════════════════════
+      - name: Score summary
+        if: always()
+        run: |
+          T1=${{ steps.test1.outputs.points || 0 }}
+          T2=${{ steps.test2.outputs.points || 0 }}
+          T3=${{ steps.test3.outputs.points || 0 }}
+          T4=${{ steps.test4.outputs.points || 0 }}
+          T5=${{ steps.test5.outputs.points || 0 }}
+          TOTAL=$((T1 + T2 + T3 + T4 + T5))
+          echo "================================"
+          echo " Test 1 (Rectangle)  : $T1 / 20"
+          echo " Test 2 (Circle)     : $T2 / 20"
+          echo " Test 3 (Mixed)      : $T3 / 20"
+          echo " Test 4 (Rect only)  : $T4 / 20"
+          echo " Test 5 (Large vals) : $T5 / 20"
+          echo "--------------------------------"
+          echo " Total               : $TOTAL / 100"
+          echo "================================"
