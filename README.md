@@ -518,79 +518,16 @@ Rectangle width=10.0 length=2.5
 
 ---
 
-## GitHub Classroom Autograder Setup
-
-Add the following to `.github/classroom/autograding.json` in your repository:
-
-```json
-{
-  "tests": [
-    {
-      "name": "Test 1 - Single rectangle",
-      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
-      "run": "java -cp out shapes.ShapeMain",
-      "input": "1\nRECTANGLE\nRed true\n5.0 8.0\n",
-      "output": "[ Rectangle ]\nColor : Red\nFilled: Yes\nWidth : 5.0\nLength: 8.0\nArea      : 40.00\nPerimeter : 26.00\n\n--- Downcast Check ---\nRectangle width=5.0 length=8.0\n",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 20
-    },
-    {
-      "name": "Test 2 - Single circle",
-      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
-      "run": "java -cp out shapes.ShapeMain",
-      "input": "1\nCIRCLE\nBlue false\n7.0\n",
-      "output": "[ Circle ]\nColor : Blue\nFilled: No\nRadius: 7.0\nArea         : 153.94\nCircumference: 43.98\n\n--- Downcast Check ---\nCircle radius=7.0\n",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 20
-    },
-    {
-      "name": "Test 3 - Mixed shapes",
-      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
-      "run": "java -cp out shapes.ShapeMain",
-      "input": "3\nRECTANGLE\nGreen true\n4.0 9.0\nCIRCLE\nYellow false\n3.5\nRECTANGLE\nBlack false\n10.0 2.5\n",
-      "output": "[ Rectangle ]\nColor : Green\nFilled: Yes\nWidth : 4.0\nLength: 9.0\nArea      : 36.00\nPerimeter : 26.00\n\n[ Circle ]\nColor : Yellow\nFilled: No\nRadius: 3.5\nArea         : 38.48\nCircumference: 21.99\n\n[ Rectangle ]\nColor : Black\nFilled: No\nWidth : 10.0\nLength: 2.5\nArea      : 25.00\nPerimeter : 25.00\n\n--- Downcast Check ---\nRectangle width=4.0 length=9.0\nCircle radius=3.5\nRectangle width=10.0 length=2.5\n",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 20
-    },
-    {
-      "name": "Test 4 - Rectangles only",
-      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
-      "run": "java -cp out shapes.ShapeMain",
-      "input": "2\nRECTANGLE\nWhite true\n6.0 6.0\nRECTANGLE\nPurple false\n1.5 12.0\n",
-      "output": "[ Rectangle ]\nColor : White\nFilled: Yes\nWidth : 6.0\nLength: 6.0\nArea      : 36.00\nPerimeter : 24.00\n\n[ Rectangle ]\nColor : Purple\nFilled: No\nWidth : 1.5\nLength: 12.0\nArea      : 18.00\nPerimeter : 27.00\n\n--- Downcast Check ---\nRectangle width=6.0 length=6.0\nRectangle width=1.5 length=12.0\n",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 20
-    },
-    {
-      "name": "Test 5 - Large values",
-      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
-      "run": "java -cp out shapes.ShapeMain",
-      "input": "2\nCIRCLE\nOrange true\n100.0\nRECTANGLE\nGray true\n999.9 888.8\n",
-      "output": "[ Circle ]\nColor : Orange\nFilled: Yes\nRadius: 100.0\nArea         : 31415.93\nCircumference: 628.32\n\n[ Rectangle ]\nColor : Gray\nFilled: Yes\nWidth : 999.9\nLength: 888.8\nArea      : 888711.12\nPerimeter : 3777.40\n\n--- Downcast Check ---\nCircle radius=100.0\nRectangle width=999.9 length=888.8\n",
-      "comparison": "exact",
-      "timeout": 10,
-      "points": 20
-    }
-  ]
-}
-```
-
----
-
 ## Grading Rubric
 
 | Test | Description | Points |
 |---|---|---|
-| Test 1 | Single rectangle — area, perimeter, toString | 20 |
-| Test 2 | Single circle — area, circumference, toString | 20 |
-| Test 3 | Mixed rectangle + circle + downcast check | 20 |
-| Test 4 | Rectangles only — downcast reports both | 20 |
-| Test 5 | Large decimal values formatted correctly | 20 |
-| **Total** | | **100** |
+| Test 1 | Single rectangle — area, perimeter, toString | 2 |
+| Test 2 | Single circle — area, circumference, toString | 2 |
+| Test 3 | Mixed rectangle + circle + downcast check | 2 |
+| Test 4 | Rectangles only — downcast reports both | 2 |
+| Test 5 | Large decimal values formatted correctly | 2 |
+| **Total** | | **10** |
 
 ---
 
@@ -670,5 +607,5 @@ Always guard with `instanceof` before casting. An unguarded cast to the wrong ty
 - [ ] `src/shapes/Rectangle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`
 - [ ] `src/shapes/Circle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`
 - [ ] `src/shapes/ShapeMain.java` — reads input, fills array, prints shapes, prints downcast check
-- [ ] All 5 autograder tests pass (100 / 100)
+- [ ] All 5 autograder tests pass (10 / 10)
 - [ ] Written answer for Task 6 is filled in as a comment
