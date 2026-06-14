@@ -21,6 +21,9 @@ Your job is to design and implement this system using **Java inheritance and abs
 
 *(See diagram above)*
 
+<img width="1472" height="1138" alt="image" src="https://github.com/user-attachments/assets/7f1320ef-2c0b-4d76-88db-3e2360664646" />
+
+
 > **Reading the diagram:**  
 > `Animal` is the abstract parent class at the top. `Dog`, `Bird`, and `Fish` each extend it (open-triangle arrow = inheritance). Italic method names in `Animal` are abstract — subclasses *must* override them. Every class also provides its own `toString()`.
 
