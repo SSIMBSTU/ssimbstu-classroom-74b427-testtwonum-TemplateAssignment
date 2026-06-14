@@ -1,0 +1,46 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Standard Addition Verification
+      id: standard-addition-verification
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Standard Addition Verification
+        setup-command: javac Calculator.java
+        command: java Calculator
+        input: 23 34
+        expected-output: 23 + 34 = 57
+        comparison-method: exact
+        timeout: 10
+        max-score: 3
+    - name: Dynamic Variables Verification
+      id: dynamic-variables-verification
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Dynamic Variables Verification
+        setup-command: javac Calculator.java
+        command: java Calculator
+        input: 100 250
+        expected-output: 100 + 250 = 350
+        comparison-method: exact
+        timeout: 10
+        max-score: 2
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        STANDARD-ADDITION-VERIFICATION_RESULTS: "${{steps.standard-addition-verification.outputs.result}}"
+        DYNAMIC-VARIABLES-VERIFICATION_RESULTS: "${{steps.dynamic-variables-verification.outputs.result}}"
+      with:
+        runners: standard-addition-verification,dynamic-variables-verification
