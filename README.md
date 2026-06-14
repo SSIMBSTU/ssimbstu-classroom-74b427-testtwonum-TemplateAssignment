@@ -21,21 +21,43 @@ Rafi realizes he needs an **abstract class** called `Shape` that enforces a cont
 
 ## UML Class Diagram
 
-*(See diagram above)*
+```
++------------------------------------------+
+|              <<abstract>>                |
+|                 Shape                    |
++------------------------------------------+
+| - color  : String                        |
+| - filled : boolean                       |
++------------------------------------------+
+| + Shape(color, filled)                   |
+| + getArea()      : double  <<abstract>>  |
+| + getPerimeter() : double  <<abstract>>  |
+| + toString()     : String                |
++------------------------------------------+
+              ^               ^
+              |               |
+         extends         extends
+              |               |
++---------------------------+   +---------------------------+
+|        Rectangle          |   |          Circle           |
++---------------------------+   +---------------------------+
+| - width  : double         |   | - radius : double         |
+| - length : double         |   +---------------------------+
++---------------------------+   | + Circle(color,filled,    |
+| + Rectangle(color,filled, |   |          radius)          |
+|             width,length) |   | + getArea()      : double |
+| + getArea()      : double |   | + getPerimeter() : double |
+| + getPerimeter() : double |   | + toString()     : String |
+| + toString()     : String |   +---------------------------+
++---------------------------+
+```
 
-> **Reading the diagram:**  
-> `Shape` is the abstract parent at the top. `Rectangle` and `Circle` extend it (open-triangle arrow = inheritance). Italic method names in `Shape` are abstract — subclasses must override them. Every class also has its own `toString()`.
+**Formulas:**
 
----
-
-## Formulas
-
-| Shape | Area | Perimeter |
-|---|---|---|
-| Rectangle | `width × length` | `2 × (width + length)` |
-| Circle | `π × radius²` | `2 × π × radius` |
-
-Use `Math.PI` for π in Java.
+```
+Rectangle  →  area = width × length           perimeter = 2 × (width + length)
+Circle     →  area = π × radius²              circumference = 2 × π × radius
+```
 
 ---
 
@@ -46,58 +68,55 @@ Use `Math.PI` for π in Java.
 | Abstract class | `Shape` cannot be instantiated directly |
 | Abstract method | `getArea()` and `getPerimeter()` declared but not implemented in `Shape` |
 | Method overriding | Each subclass provides its own area and perimeter formulas |
-| Early binding | Calling `toString()` on a `Shape` reference is resolved at compile time to `Shape`'s version — but at runtime, Java dispatches to the subclass version |
-| Downcasting | Casting a `Shape` reference back to `Rectangle` to access rectangle-specific methods |
-| `toString()` | Each class formats itself as a readable string |
+| Early binding | `toString()` on a `Shape` reference — compile-time type governs accessibility, runtime type governs which version runs |
+| Downcasting | Casting a `Shape` reference back to `Rectangle` to call `getWidth()` |
+| `toString()` | Each class formats itself as a readable one-block string |
+
+---
+
+## Project Structure
+
+Your GitHub Classroom repository must have exactly this layout:
+
+```
+src/
+  shapes/
+    Shape.java
+    Rectangle.java
+    Circle.java
+    ShapeMain.java
+```
+
+The autograder compiles from the `src/` root and runs `shapes.ShapeMain`.
 
 ---
 
 ## Starter Code
-
-Create the following files inside a package named `shapes`.
 
 ### `Shape.java`
 
 ```java
 package shapes;
 
-/**
- * Abstract base class representing any 2D geometric shape.
- * Cannot be instantiated directly — you must use a subclass.
- */
 public abstract class Shape {
 
-    // ── Private fields ────────────────────────────────────────
     private String  color;
     private boolean filled;
 
-    // ── Constructor ───────────────────────────────────────────
     public Shape(String color, boolean filled) {
         this.color  = color;
         this.filled = filled;
     }
 
-    // ── Abstract methods — subclasses MUST override these ─────
-
-    /** Returns the area of this shape. */
     public abstract double getArea();
-
-    /** Returns the perimeter (circumference) of this shape. */
     public abstract double getPerimeter();
 
-    // ── Concrete method ───────────────────────────────────────
-
-    /**
-     * Returns a text summary of this shape.
-     * Subclasses should call super.toString() and append their own details.
-     */
     @Override
     public String toString() {
         return "Color : " + color + "\n" +
                "Filled: " + (filled ? "Yes" : "No");
     }
 
-    // ── Getters and setters ───────────────────────────────────
     public String  getColor()           { return color;  }
     public boolean isFilled()           { return filled; }
     public void    setColor(String c)   { this.color  = c; }
@@ -115,14 +134,11 @@ public class Rectangle extends Shape {
     private double width;
     private double length;
 
-    // ── Constructor ───────────────────────────────────────────
     public Rectangle(String color, boolean filled, double width, double length) {
         super(color, filled);
         this.width  = width;
         this.length = length;
     }
-
-    // ── Method overriding ─────────────────────────────────────
 
     @Override
     public double getArea() {
@@ -134,8 +150,6 @@ public class Rectangle extends Shape {
         return 2 * (width + length);
     }
 
-    // ── toString ──────────────────────────────────────────────
-
     @Override
     public String toString() {
         return "[ Rectangle ]\n" +
@@ -146,7 +160,6 @@ public class Rectangle extends Shape {
                String.format("Perimeter : %.2f", getPerimeter());
     }
 
-    // ── Getters ───────────────────────────────────────────────
     public double getWidth()  { return width;  }
     public double getLength() { return length; }
 }
@@ -161,13 +174,10 @@ public class Circle extends Shape {
 
     private double radius;
 
-    // ── Constructor ───────────────────────────────────────────
     public Circle(String color, boolean filled, double radius) {
         super(color, filled);
         this.radius = radius;
     }
-
-    // ── Method overriding ─────────────────────────────────────
 
     @Override
     public double getArea() {
@@ -179,8 +189,6 @@ public class Circle extends Shape {
         return 2 * Math.PI * radius;
     }
 
-    // ── toString ──────────────────────────────────────────────
-
     @Override
     public String toString() {
         return "[ Circle ]\n" +
@@ -190,111 +198,46 @@ public class Circle extends Shape {
                String.format("Circumference: %.2f", getPerimeter());
     }
 
-    // ── Getter ────────────────────────────────────────────────
     public double getRadius() { return radius; }
 }
 ```
 
 ---
 
-## Tasks for Students
+## Your Task — `ShapeMain.java`
 
-Complete `ShapeMain.java` by following the instructions in each comment. Do not change anything outside the marked sections.
+Read input from `System.in` using a `Scanner`. The program will receive a series of shape descriptions and must print each shape's full summary followed by a blank line.
 
-### `ShapeMain.java`
+### Input format
 
-```java
-package shapes;
-
-public class ShapeMain {
-
-    public static void main(String[] args) {
-
-        // ── TASK 1 ────────────────────────────────────────────
-        // Create two Shape references (use the Shape type, NOT
-        // Rectangle or Circle) and assign objects to them.
-        //
-        //   s1 → Rectangle: color="Red",  filled=true,  width=5.0, length=8.0
-        //   s2 → Circle:    color="Blue", filled=false, radius=7.0
-        //
-        // YOUR CODE HERE:
-        Shape s1 = /* ??? */;
-        Shape s2 = /* ??? */;
-
-
-        // ── TASK 2 ────────────────────────────────────────────
-        // Store both shapes in a Shape array called shapes.
-        //
-        // YOUR CODE HERE:
-        Shape[] shapes = /* ??? */;
-
-
-        // ── TASK 3 ────────────────────────────────────────────
-        // Loop through the array. For each shape:
-        //   a) Print the shape info using System.out.println
-        //      (this automatically calls toString())
-        //   b) Print a blank line between shapes
-        //
-        // YOUR CODE HERE:
-
-
-        // ── TASK 4 — Early Binding ────────────────────────────
-        // The reference below has type Shape, but the object
-        // is a Rectangle at runtime.
-        //
-        // Q: When toString() is called on shapeRef, which class
-        //    version runs — Shape's or Rectangle's? Why?
-        //
-        // Write your answer as a comment on the line marked ANSWER.
-        //
-        Shape shapeRef = new Rectangle("Green", true, 4.0, 9.0);
-        System.out.println(shapeRef.toString());
-        // ANSWER: _______________________________________________
-
-
-        // ── TASK 5 — Downcasting ─────────────────────────────
-        // s1 holds a Rectangle but its declared type is Shape.
-        // You cannot call getWidth() on s1 directly.
-        //
-        // Step 1: Use instanceof to check s1 is a Rectangle.
-        // Step 2: Downcast s1 to a Rectangle variable called r.
-        // Step 3: Print r.getWidth() and r.getLength().
-        //
-        // YOUR CODE HERE:
-
-
-        // ── TASK 6 — Abstract class restriction ───────────────
-        // Uncomment the line below. What compiler error appears?
-        // Write the error as a comment, then re-comment the line.
-        //
-        // Shape s = new Shape("Black", false);
-        // ERROR: ________________________________________________
-
-
-        // ── TASK 7 (Bonus) ────────────────────────────────────
-        // Write a static method called printShapeInfo that
-        // accepts a Shape parameter and prints its area and
-        // perimeter. Call it once with s1 and once with s2.
-        //
-        // Notice: the same method works for BOTH shape types
-        // without any if/else. This is called polymorphism.
-        //
-        // YOUR CODE HERE:
-    }
-
-    // ── Bonus method stub ─────────────────────────────────────
-    // public static void printShapeInfo(Shape s) { ... }
-}
 ```
+<numberOfShapes>
+For each shape:
+  <shapeType>          ← RECTANGLE or CIRCLE
+  <color> <filled>     ← e.g.  Red true
+  <dimensions>         ← width length  (Rectangle)  OR  radius  (Circle)
+```
+
+### Output format
+
+Print each shape's `toString()` output followed by one blank line.  
+All decimal values must be formatted to **exactly 2 decimal places**.
 
 ---
 
 ## Sample Input and Output
 
-The program uses no keyboard input — all values are hardcoded in `main()`. The expected console output for the completed tasks is shown below.
+### Test 1 — one rectangle
 
-### Task 3 output — printing all shapes
+**Input**
+```
+1
+RECTANGLE
+Red true
+5.0 8.0
+```
 
+**Output**
 ```
 [ Rectangle ]
 Color : Red
@@ -304,15 +247,240 @@ Length: 8.0
 Area      : 40.00
 Perimeter : 26.00
 
+```
+
+---
+
+### Test 2 — one circle
+
+**Input**
+```
+1
+CIRCLE
+Blue false
+7.0
+```
+
+**Output**
+```
 [ Circle ]
 Color : Blue
 Filled: No
 Radius: 7.0
 Area         : 153.94
 Circumference: 43.98
+
 ```
 
-### Task 4 output — early binding test
+---
+
+### Test 3 — mixed shapes
+
+**Input**
+```
+3
+RECTANGLE
+Green true
+4.0 9.0
+CIRCLE
+Yellow false
+3.5
+RECTANGLE
+Black false
+10.0 2.5
+```
+
+**Output**
+```
+[ Rectangle ]
+Color : Green
+Filled: Yes
+Width : 4.0
+Length: 9.0
+Area      : 36.00
+Perimeter : 26.00
+
+[ Circle ]
+Color : Yellow
+Filled: No
+Radius: 3.5
+Area         : 38.48
+Circumference: 21.99
+
+[ Rectangle ]
+Color : Black
+Filled: No
+Width : 10.0
+Length: 2.5
+Area      : 25.00
+Perimeter : 25.00
+
+```
+
+---
+
+### Test 4 — downcasting check (rectangle-only run)
+
+**Input**
+```
+2
+RECTANGLE
+White true
+6.0 6.0
+RECTANGLE
+Purple false
+1.5 12.0
+```
+
+**Output**
+```
+[ Rectangle ]
+Color : White
+Filled: Yes
+Width : 6.0
+Length: 6.0
+Area      : 36.00
+Perimeter : 24.00
+
+[ Rectangle ]
+Color : Purple
+Filled: No
+Width : 1.5
+Length: 12.0
+Area      : 18.00
+Perimeter : 27.00
+
+```
+
+---
+
+### Test 5 — large values
+
+**Input**
+```
+2
+CIRCLE
+Orange true
+100.0
+RECTANGLE
+Gray true
+999.9 888.8
+```
+
+**Output**
+```
+[ Circle ]
+Color : Orange
+Filled: Yes
+Radius: 100.0
+Area         : 31415.93
+Circumference: 628.32
+
+[ Rectangle ]
+Color : Gray
+Filled: Yes
+Width : 999.9
+Length: 888.8
+Area      : 888711.12
+Perimeter : 3777.40
+
+```
+
+---
+
+## `ShapeMain.java` Skeleton
+
+```java
+package shapes;
+
+import java.util.Scanner;
+
+public class ShapeMain {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // ── TASK 1 ────────────────────────────────────────────
+        // Read the number of shapes from input.
+        //
+        int n = /* YOUR CODE */;
+
+        // ── TASK 2 ────────────────────────────────────────────
+        // Declare a Shape array of size n.
+        //
+        Shape[] shapes = /* YOUR CODE */;
+
+        // ── TASK 3 ────────────────────────────────────────────
+        // Loop n times. For each iteration:
+        //   a) Read the shape type  (RECTANGLE or CIRCLE)
+        //   b) Read color and filled on the same line
+        //   c) Read dimensions (width + length OR radius)
+        //   d) Create the correct object and store it in shapes[i]
+        //      Use the Shape reference type for the array element.
+        //
+        for (int i = 0; i < n; i++) {
+            String type   = /* YOUR CODE */;
+            String color  = /* YOUR CODE */;
+            boolean filled = /* YOUR CODE */;
+
+            if (type.equals("RECTANGLE")) {
+                double width  = /* YOUR CODE */;
+                double length = /* YOUR CODE */;
+                shapes[i] = /* YOUR CODE */;
+
+            } else if (type.equals("CIRCLE")) {
+                double radius = /* YOUR CODE */;
+                shapes[i] = /* YOUR CODE */;
+            }
+        }
+
+        // ── TASK 4 ────────────────────────────────────────────
+        // Loop through the shapes array.
+        // For each shape: print it (toString() is called automatically)
+        // then print a blank line.
+        //
+        for (Shape s : shapes) {
+            /* YOUR CODE */
+        }
+
+        // ── TASK 5 — Downcasting ─────────────────────────────
+        // After printing all shapes, loop through the array again.
+        // If the shape is a Rectangle, downcast it and print:
+        //   "Rectangle width=" + width + " length=" + length
+        // If the shape is a Circle, downcast it and print:
+        //   "Circle radius=" + radius
+        //
+        System.out.println("--- Downcast Check ---");
+        for (Shape s : shapes) {
+            if (s instanceof Rectangle) {
+                Rectangle r = /* YOUR CODE */;
+                System.out.println("Rectangle width="  + r.getWidth()
+                                 + " length=" + r.getLength());
+            } else if (s instanceof Circle) {
+                Circle c = /* YOUR CODE */;
+                System.out.println("Circle radius=" + c.getRadius());
+            }
+        }
+
+        // ── TASK 6 — Abstract class (written answer) ──────────
+        // What error does the compiler give if you write:
+        //     Shape s = new Shape("Red", true);
+        //
+        // Write your answer here as a comment:
+        // ANSWER: _______________________________________________
+
+        sc.close();
+    }
+}
+```
+
+---
+
+## Updated Expected Output (with Downcast Check)
+
+The autograder tests `ShapeMain` end-to-end including the downcast section.  
+Below is the full expected output for **Test 3**:
 
 ```
 [ Rectangle ]
@@ -322,92 +490,103 @@ Width : 4.0
 Length: 9.0
 Area      : 36.00
 Perimeter : 26.00
-```
 
-> The `Shape` reference `shapeRef` points to a `Rectangle` object at runtime. Java's virtual method dispatch (late binding) calls `Rectangle.toString()` — not `Shape.toString()`. The declared type controls what methods you can *call*; the actual object type controls which version *runs*.
+[ Circle ]
+Color : Yellow
+Filled: No
+Radius: 3.5
+Area         : 38.48
+Circumference: 21.99
 
-### Task 5 output — downcasting
+[ Rectangle ]
+Color : Black
+Filled: No
+Width : 10.0
+Length: 2.5
+Area      : 25.00
+Perimeter : 25.00
 
-```
-Downcasting s1 to Rectangle...
-Width : 5.0
-Length: 8.0
-```
-
-### Task 7 output — bonus polymorphism method
-
-```
---- Shape Info ---
-Area     : 40.00
-Perimeter: 26.00
-
---- Shape Info ---
-Area     : 153.94
-Perimeter: 43.98
+--- Downcast Check ---
+Rectangle width=4.0 length=9.0
+Circle radius=3.5
+Rectangle width=10.0 length=2.5
 ```
 
 ---
 
-## Full Working Solution (check your work after attempting)
+## GitHub Classroom Autograder Setup
 
-<details>
-<summary>Click to reveal solution</summary>
+Add the following to `.github/classroom/autograding.json` in your repository:
 
-```java
-package shapes;
-
-public class ShapeMain {
-
-    public static void main(String[] args) {
-
-        // Task 1
-        Shape s1 = new Rectangle("Red",  true,  5.0, 8.0);
-        Shape s2 = new Circle(   "Blue", false, 7.0);
-
-        // Task 2
-        Shape[] shapes = { s1, s2 };
-
-        // Task 3
-        for (Shape s : shapes) {
-            System.out.println(s);
-            System.out.println();
-        }
-
-        // Task 4
-        Shape shapeRef = new Rectangle("Green", true, 4.0, 9.0);
-        System.out.println(shapeRef.toString());
-        // ANSWER: Rectangle's toString() runs. Even though shapeRef is
-        // declared as Shape, the object is a Rectangle at runtime.
-        // Java uses late binding (dynamic dispatch) for non-static,
-        // non-final methods, so the overridden version is always called.
-
-        // Task 5
-        if (s1 instanceof Rectangle) {
-            Rectangle r = (Rectangle) s1;   // downcast
-            System.out.println("Downcasting s1 to Rectangle...");
-            System.out.println("Width : " + r.getWidth());
-            System.out.println("Length: " + r.getLength());
-        }
-
-        // Task 6 — keep commented:
-        // Shape s = new Shape("Black", false);
-        // ERROR: Shape is abstract; cannot be instantiated
-
-        // Task 7
-        System.out.println("\n--- Shape Info ---");
-        printShapeInfo(s1);
-        System.out.println("\n--- Shape Info ---");
-        printShapeInfo(s2);
+```json
+{
+  "tests": [
+    {
+      "name": "Test 1 - Single rectangle",
+      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
+      "run": "java -cp out shapes.ShapeMain",
+      "input": "1\nRECTANGLE\nRed true\n5.0 8.0\n",
+      "output": "[ Rectangle ]\nColor : Red\nFilled: Yes\nWidth : 5.0\nLength: 8.0\nArea      : 40.00\nPerimeter : 26.00\n\n--- Downcast Check ---\nRectangle width=5.0 length=8.0\n",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
+    },
+    {
+      "name": "Test 2 - Single circle",
+      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
+      "run": "java -cp out shapes.ShapeMain",
+      "input": "1\nCIRCLE\nBlue false\n7.0\n",
+      "output": "[ Circle ]\nColor : Blue\nFilled: No\nRadius: 7.0\nArea         : 153.94\nCircumference: 43.98\n\n--- Downcast Check ---\nCircle radius=7.0\n",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
+    },
+    {
+      "name": "Test 3 - Mixed shapes",
+      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
+      "run": "java -cp out shapes.ShapeMain",
+      "input": "3\nRECTANGLE\nGreen true\n4.0 9.0\nCIRCLE\nYellow false\n3.5\nRECTANGLE\nBlack false\n10.0 2.5\n",
+      "output": "[ Rectangle ]\nColor : Green\nFilled: Yes\nWidth : 4.0\nLength: 9.0\nArea      : 36.00\nPerimeter : 26.00\n\n[ Circle ]\nColor : Yellow\nFilled: No\nRadius: 3.5\nArea         : 38.48\nCircumference: 21.99\n\n[ Rectangle ]\nColor : Black\nFilled: No\nWidth : 10.0\nLength: 2.5\nArea      : 25.00\nPerimeter : 25.00\n\n--- Downcast Check ---\nRectangle width=4.0 length=9.0\nCircle radius=3.5\nRectangle width=10.0 length=2.5\n",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
+    },
+    {
+      "name": "Test 4 - Rectangles only",
+      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
+      "run": "java -cp out shapes.ShapeMain",
+      "input": "2\nRECTANGLE\nWhite true\n6.0 6.0\nRECTANGLE\nPurple false\n1.5 12.0\n",
+      "output": "[ Rectangle ]\nColor : White\nFilled: Yes\nWidth : 6.0\nLength: 6.0\nArea      : 36.00\nPerimeter : 24.00\n\n[ Rectangle ]\nColor : Purple\nFilled: No\nWidth : 1.5\nLength: 12.0\nArea      : 18.00\nPerimeter : 27.00\n\n--- Downcast Check ---\nRectangle width=6.0 length=6.0\nRectangle width=1.5 length=12.0\n",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
+    },
+    {
+      "name": "Test 5 - Large values",
+      "setup": "javac -d out src/shapes/Shape.java src/shapes/Rectangle.java src/shapes/Circle.java src/shapes/ShapeMain.java",
+      "run": "java -cp out shapes.ShapeMain",
+      "input": "2\nCIRCLE\nOrange true\n100.0\nRECTANGLE\nGray true\n999.9 888.8\n",
+      "output": "[ Circle ]\nColor : Orange\nFilled: Yes\nRadius: 100.0\nArea         : 31415.93\nCircumference: 628.32\n\n[ Rectangle ]\nColor : Gray\nFilled: Yes\nWidth : 999.9\nLength: 888.8\nArea      : 888711.12\nPerimeter : 3777.40\n\n--- Downcast Check ---\nCircle radius=100.0\nRectangle width=999.9 length=888.8\n",
+      "comparison": "exact",
+      "timeout": 10,
+      "points": 20
     }
-
-    public static void printShapeInfo(Shape s) {
-        System.out.printf("Area     : %.2f%n", s.getArea());
-        System.out.printf("Perimeter: %.2f%n", s.getPerimeter());
-    }
+  ]
 }
 ```
 
-</details>
+---
+
+## Grading Rubric
+
+| Test | Description | Points |
+|---|---|---|
+| Test 1 | Single rectangle — area, perimeter, toString | 20 |
+| Test 2 | Single circle — area, circumference, toString | 20 |
+| Test 3 | Mixed rectangle + circle + downcast check | 20 |
+| Test 4 | Rectangles only — downcast reports both | 20 |
+| Test 5 | Large decimal values formatted correctly | 20 |
+| **Total** | | **100** |
 
 ---
 
@@ -415,43 +594,56 @@ public class ShapeMain {
 
 ### Abstract class
 
-`Shape` is declared `abstract`, so `new Shape(...)` causes a compile-time error. Its job is to define the *contract* — every shape must provide `getArea()` and `getPerimeter()` — without specifying *how* to compute them.
+`Shape` is declared `abstract`, so `new Shape(...)` causes a **compile-time error**:
+
+```
+error: Shape is abstract; cannot be instantiated
+```
+
+Its job is to define the contract — every shape must provide `getArea()` and `getPerimeter()` — without specifying how to compute them.
 
 ### Method overriding
 
-When `Rectangle` writes `@Override public double getArea()`, it replaces `Shape`'s declaration with its own formula (`width * length`). Rules for a valid override:
+When `Rectangle` writes `@Override public double getArea()`, it replaces `Shape`'s declaration with its own formula. Rules for a valid override:
 
 - Same method name and parameter list.
 - Same or covariant return type.
-- Cannot reduce visibility (cannot change `public` to `private`).
+- Cannot reduce visibility (`public` cannot become `private`).
 
-The `@Override` annotation is optional but recommended — the compiler catches typos in the signature.
+The `@Override` annotation is optional but strongly recommended — the compiler catches signature typos.
 
 ### Early binding vs late binding
 
-In Java, `static`, `final`, and `private` methods use **early binding** — the exact method call is decided at compile time based on the reference type. All other methods (including `getArea()` and `toString()`) use **late binding (dynamic dispatch)** — the JVM checks the actual object type at runtime and calls the correct overridden version.
+`static`, `final`, and `private` methods use **early (static) binding** — resolved at compile time.  
+All other methods use **late (dynamic) binding** — the JVM checks the actual object type at runtime.
 
 ```java
 Shape s = new Rectangle("Red", true, 5, 8);
-s.getArea();     // ← calls Rectangle.getArea() at runtime (late binding)
+s.getArea();      // calls Rectangle.getArea() at runtime — late binding
+s.toString();     // calls Rectangle.toString() at runtime — late binding
 ```
 
-The declared type `Shape` controls what method names are *accessible*. The runtime type `Rectangle` controls which *version* runs.
+The declared type `Shape` controls what method *names* are accessible.  
+The runtime type `Rectangle` controls which *version* runs.
 
 ### Downcasting
 
 ```java
 Shape s1 = new Rectangle("Red", true, 5.0, 8.0);
 
-// s1.getWidth();   ← compile error: Shape has no getWidth()
+// s1.getWidth();          ← compile error: Shape has no getWidth()
 
 if (s1 instanceof Rectangle) {
-    Rectangle r = (Rectangle) s1;  // downcast
-    r.getWidth();                   // now accessible
+    Rectangle r = (Rectangle) s1;   // downcast
+    r.getWidth();                    // now accessible
 }
 ```
 
-Always use `instanceof` before downcasting. Without the check, an incorrect cast throws `ClassCastException` at runtime.
+Always guard with `instanceof` before casting. An unguarded cast to the wrong type throws `ClassCastException` at runtime.
+
+### Why `toString()` in each class?
+
+`System.out.println(shape)` automatically calls `toString()` on the object. By overriding it in every subclass (and calling `super.toString()` to reuse the parent's color/filled lines), each shape can print a complete, neatly formatted summary of itself with no extra code in `main`.
 
 ---
 
@@ -460,18 +652,19 @@ Always use `instanceof` before downcasting. Without the check, an incorrect cast
 | Mistake | What happens |
 |---|---|
 | `new Shape("Red", true)` | Compile error — cannot instantiate abstract class |
-| Forgetting `@Override` on `getArea()` | Silently creates a new method; the abstract version remains unimplemented, causing compile error |
+| Forgetting `@Override` on `getArea()` | Silently creates a new method; the abstract method remains unimplemented — compile error |
 | `(Rectangle) s2` where `s2` holds a `Circle` | `ClassCastException` at runtime |
-| Calling `getWidth()` on a `Shape` reference | Compile error — `getWidth()` is not declared in `Shape` |
-| `toString()` not calling `super.toString()` | Output loses `color` and `filled` from the parent |
+| Calling `getWidth()` on a `Shape` reference | Compile error — not declared in `Shape` |
+| `toString()` not calling `super.toString()` | Output loses `color` and `filled` lines — test fails |
+| Extra space or wrong decimal places | Autograder uses exact match — `40.0` fails where `40.00` is expected |
 
 ---
 
 ## Submission Checklist
 
-- [ ] `Shape.java` — abstract class with two abstract methods and `toString()`
-- [ ] `Rectangle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`; adds `getWidth()`, `getLength()`
-- [ ] `Circle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`; adds `getRadius()`
-- [ ] `ShapeMain.java` — all seven tasks completed with comments answered
-- [ ] Output matches the sample output above (values rounded to 2 decimal places)
-- [ ] Program compiles with zero errors or warnings
+- [ ] `src/shapes/Shape.java` — abstract class, two abstract methods, `toString()`
+- [ ] `src/shapes/Rectangle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`
+- [ ] `src/shapes/Circle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`
+- [ ] `src/shapes/ShapeMain.java` — reads input, fills array, prints shapes, prints downcast check
+- [ ] All 5 autograder tests pass (100 / 100)
+- [ ] Written answer for Task 6 is filled in as a comment
