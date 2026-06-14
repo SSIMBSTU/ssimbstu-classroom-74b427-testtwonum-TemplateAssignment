@@ -1,4 +1,4 @@
-# Java Practice Problem — The Zoo Animal System
+# Java Practice Problem — The Shape Area Calculator
 
 **Course:** Object-Oriented Programming  
 **Topics Covered:** Abstract Classes · Method Overriding · Early Binding · Downcasting · `toString()`
@@ -7,13 +7,15 @@
 
 ## The Story
 
-You have just been hired as a junior software developer at **Dhaka City Zoo**. The zoo manager, Mr. Karim, needs a small Java program to keep track of the animals. The zoo has three kinds of animals right now: **dogs**, **birds**, and **fish**.
+Rafi is a first-year student at MBSTU who just started learning Java. His professor gives the class a small project:
 
-Mr. Karim tells you:
+> "Build a shape calculator for a geometry app. The app must support **rectangles** and **circles**. Every shape has a color and can be filled or unfilled. Each shape must be able to report its **area**, its **perimeter**, and a text summary of itself."
 
-> "Every animal has a name, an age, and a habitat. But each animal makes a different sound and moves in a completely different way. I also need a neat summary of each animal I can print on a card."
+The professor adds one important rule:
 
-Your job is to design and implement this system using **Java inheritance and abstract classes** so that future animal types (lions, snakes, etc.) can be added easily without rewriting everything.
+> "You must design this so that any new shape — triangle, pentagon, anything — can be added later without rewriting the calculator code."
+
+Rafi realizes he needs an **abstract class** called `Shape` that enforces a contract: every shape *must* implement `getArea()` and `getPerimeter()`. `Rectangle` and `Circle` will extend `Shape` and provide their own formulas.
 
 ---
 
@@ -21,200 +23,175 @@ Your job is to design and implement this system using **Java inheritance and abs
 
 *(See diagram above)*
 
-<img width="1472" height="1138" alt="image" src="https://github.com/user-attachments/assets/7f1320ef-2c0b-4d76-88db-3e2360664646" />
-
-
 > **Reading the diagram:**  
-> `Animal` is the abstract parent class at the top. `Dog`, `Bird`, and `Fish` each extend it (open-triangle arrow = inheritance). Italic method names in `Animal` are abstract — subclasses *must* override them. Every class also provides its own `toString()`.
+> `Shape` is the abstract parent at the top. `Rectangle` and `Circle` extend it (open-triangle arrow = inheritance). Italic method names in `Shape` are abstract — subclasses must override them. Every class also has its own `toString()`.
+
+---
+
+## Formulas
+
+| Shape | Area | Perimeter |
+|---|---|---|
+| Rectangle | `width × length` | `2 × (width + length)` |
+| Circle | `π × radius²` | `2 × π × radius` |
+
+Use `Math.PI` for π in Java.
 
 ---
 
 ## Concepts You Will Practice
 
-| Concept | Where It Appears in This Problem |
+| Concept | Where It Appears |
 |---|---|
-| **Abstract class** | `Animal` cannot be instantiated directly |
-| **Abstract method** | `makeSound()` and `move()` are declared but not implemented in `Animal` |
-| **Method overriding** | Each subclass provides its own `makeSound()` and `move()` |
-| **Early binding** | Calling `toString()` on an `Animal` reference resolves at *compile time* to `Animal.toString()` |
-| **Downcasting** | Casting an `Animal` reference back to `Dog` to call `fetch()` |
-| **`toString()`** | Each class formats its own information as a readable string |
+| Abstract class | `Shape` cannot be instantiated directly |
+| Abstract method | `getArea()` and `getPerimeter()` declared but not implemented in `Shape` |
+| Method overriding | Each subclass provides its own area and perimeter formulas |
+| Early binding | Calling `toString()` on a `Shape` reference is resolved at compile time to `Shape`'s version — but at runtime, Java dispatches to the subclass version |
+| Downcasting | Casting a `Shape` reference back to `Rectangle` to access rectangle-specific methods |
+| `toString()` | Each class formats itself as a readable string |
 
 ---
 
 ## Starter Code
 
-Create the following files inside a package named `zoo`.
+Create the following files inside a package named `shapes`.
 
-### `Animal.java`
+### `Shape.java`
 
 ```java
-package zoo;
+package shapes;
 
 /**
- * Abstract base class representing any animal in the zoo.
- * Cannot be instantiated directly.
+ * Abstract base class representing any 2D geometric shape.
+ * Cannot be instantiated directly — you must use a subclass.
  */
-public abstract class Animal {
+public abstract class Shape {
 
-    // ── Fields ────────────────────────────────────────────────
-    private String name;
-    private int    age;
-    private String habitat;
+    // ── Private fields ────────────────────────────────────────
+    private String  color;
+    private boolean filled;
 
     // ── Constructor ───────────────────────────────────────────
-    public Animal(String name, int age, String habitat) {
-        this.name    = name;
-        this.age     = age;
-        this.habitat = habitat;
+    public Shape(String color, boolean filled) {
+        this.color  = color;
+        this.filled = filled;
     }
 
-    // ── Abstract methods (subclasses MUST override these) ─────
+    // ── Abstract methods — subclasses MUST override these ─────
 
-    /** Every animal makes a different sound. */
-    public abstract void makeSound();
+    /** Returns the area of this shape. */
+    public abstract double getArea();
 
-    /** Every animal moves in a different way. */
-    public abstract void move();
+    /** Returns the perimeter (circumference) of this shape. */
+    public abstract double getPerimeter();
 
     // ── Concrete method ───────────────────────────────────────
 
     /**
-     * Returns a formatted summary of this animal.
-     * Subclasses may call super.toString() and append extra info.
+     * Returns a text summary of this shape.
+     * Subclasses should call super.toString() and append their own details.
      */
     @Override
     public String toString() {
-        return "Name   : " + name    + "\n" +
-               "Age    : " + age     + " years\n" +
-               "Habitat: " + habitat;
+        return "Color : " + color + "\n" +
+               "Filled: " + (filled ? "Yes" : "No");
     }
 
-    // ── Getters ───────────────────────────────────────────────
-    public String getName()    { return name;    }
-    public int    getAge()     { return age;     }
-    public String getHabitat() { return habitat; }
+    // ── Getters and setters ───────────────────────────────────
+    public String  getColor()           { return color;  }
+    public boolean isFilled()           { return filled; }
+    public void    setColor(String c)   { this.color  = c; }
+    public void    setFilled(boolean f) { this.filled = f; }
 }
 ```
 
-### `Dog.java`
+### `Rectangle.java`
 
 ```java
-package zoo;
+package shapes;
 
-public class Dog extends Animal {
+public class Rectangle extends Shape {
 
-    private String breed;
+    private double width;
+    private double length;
 
-    public Dog(String name, int age, String breed) {
-        super(name, age, "Land");   // dogs always live on land
-        this.breed = breed;
+    // ── Constructor ───────────────────────────────────────────
+    public Rectangle(String color, boolean filled, double width, double length) {
+        super(color, filled);
+        this.width  = width;
+        this.length = length;
     }
 
     // ── Method overriding ─────────────────────────────────────
 
     @Override
-    public void makeSound() {
-        System.out.println(getName() + " says: Woof! Woof!");
+    public double getArea() {
+        return width * length;
     }
 
     @Override
-    public void move() {
-        System.out.println(getName() + " runs on four legs.");
+    public double getPerimeter() {
+        return 2 * (width + length);
     }
 
-    // ── Dog-specific method ───────────────────────────────────
-
-    public void fetch() {
-        System.out.println(getName() + " fetches the ball!");
-    }
-
-    // ── toString ─────────────────────────────────────────────
+    // ── toString ──────────────────────────────────────────────
 
     @Override
     public String toString() {
-        return "[ Dog ]\n" +
-               super.toString() + "\n" +
-               "Breed  : " + breed;
+        return "[ Rectangle ]\n" +
+               super.toString()  + "\n" +
+               "Width : " + width  + "\n" +
+               "Length: " + length + "\n" +
+               String.format("Area      : %.2f", getArea())      + "\n" +
+               String.format("Perimeter : %.2f", getPerimeter());
     }
+
+    // ── Getters ───────────────────────────────────────────────
+    public double getWidth()  { return width;  }
+    public double getLength() { return length; }
 }
 ```
 
-### `Bird.java`
+### `Circle.java`
 
 ```java
-package zoo;
+package shapes;
 
-public class Bird extends Animal {
+public class Circle extends Shape {
 
-    private boolean canFly;
+    private double radius;
 
-    public Bird(String name, int age, boolean canFly) {
-        super(name, age, "Sky/Trees");
-        this.canFly = canFly;
+    // ── Constructor ───────────────────────────────────────────
+    public Circle(String color, boolean filled, double radius) {
+        super(color, filled);
+        this.radius = radius;
+    }
+
+    // ── Method overriding ─────────────────────────────────────
+
+    @Override
+    public double getArea() {
+        return Math.PI * radius * radius;
     }
 
     @Override
-    public void makeSound() {
-        System.out.println(getName() + " says: Tweet! Tweet!");
+    public double getPerimeter() {
+        return 2 * Math.PI * radius;
     }
 
-    @Override
-    public void move() {
-        if (canFly) {
-            System.out.println(getName() + " flies through the air.");
-        } else {
-            System.out.println(getName() + " walks on two legs (cannot fly).");
-        }
-    }
-
-    public void sing() {
-        System.out.println(getName() + " sings a beautiful song!");
-    }
+    // ── toString ──────────────────────────────────────────────
 
     @Override
     public String toString() {
-        return "[ Bird ]\n" +
+        return "[ Circle ]\n" +
                super.toString() + "\n" +
-               "Can fly: " + (canFly ? "Yes" : "No");
-    }
-}
-```
-
-### `Fish.java`
-
-```java
-package zoo;
-
-public class Fish extends Animal {
-
-    private String waterType;   // "Freshwater" or "Saltwater"
-
-    public Fish(String name, int age, String waterType) {
-        super(name, age, "Water");
-        this.waterType = waterType;
+               "Radius: " + radius + "\n" +
+               String.format("Area         : %.2f", getArea())      + "\n" +
+               String.format("Circumference: %.2f", getPerimeter());
     }
 
-    @Override
-    public void makeSound() {
-        System.out.println(getName() + " blows bubbles silently.");
-    }
-
-    @Override
-    public void move() {
-        System.out.println(getName() + " swims gracefully underwater.");
-    }
-
-    public void blowBubbles() {
-        System.out.println(getName() + " blows a stream of bubbles!");
-    }
-
-    @Override
-    public String toString() {
-        return "[ Fish ]\n" +
-               super.toString() + "\n" +
-               "Water  : " + waterType;
-    }
+    // ── Getter ────────────────────────────────────────────────
+    public double getRadius() { return radius; }
 }
 ```
 
@@ -222,120 +199,215 @@ public class Fish extends Animal {
 
 ## Tasks for Students
 
-Complete the `ZooMain.java` file below by following the instructions in each comment. **Do not change anything outside the marked sections.**
+Complete `ShapeMain.java` by following the instructions in each comment. Do not change anything outside the marked sections.
 
-### `ZooMain.java`
+### `ShapeMain.java`
 
 ```java
-package zoo;
+package shapes;
 
-public class ZooMain {
+public class ShapeMain {
 
     public static void main(String[] args) {
 
         // ── TASK 1 ────────────────────────────────────────────
-        // Create three Animal references (use the Animal type,
-        // NOT Dog / Bird / Fish) and assign a Dog, a Bird, and
-        // a Fish to them.
+        // Create two Shape references (use the Shape type, NOT
+        // Rectangle or Circle) and assign objects to them.
         //
-        //  Dog  : name="Bruno",  age=3, breed="Labrador"
-        //  Bird : name="Tweety", age=1, canFly=true
-        //  Fish : name="Nemo",   age=2, waterType="Saltwater"
+        //   s1 → Rectangle: color="Red",  filled=true,  width=5.0, length=8.0
+        //   s2 → Circle:    color="Blue", filled=false, radius=7.0
         //
         // YOUR CODE HERE:
-        Animal a1 = /* ??? */;
-        Animal a2 = /* ??? */;
-        Animal a3 = /* ??? */;
+        Shape s1 = /* ??? */;
+        Shape s2 = /* ??? */;
 
 
         // ── TASK 2 ────────────────────────────────────────────
-        // Store all three animals in an Animal array called zoo.
+        // Store both shapes in a Shape array called shapes.
         //
         // YOUR CODE HERE:
-        Animal[] zoo = /* ??? */;
+        Shape[] shapes = /* ??? */;
 
 
         // ── TASK 3 ────────────────────────────────────────────
-        // Loop through the array and for each animal:
-        //   a) Print the animal info using println (this calls toString())
-        //   b) Call makeSound()
-        //   c) Call move()
-        //   d) Print a blank line between animals
+        // Loop through the array. For each shape:
+        //   a) Print the shape info using System.out.println
+        //      (this automatically calls toString())
+        //   b) Print a blank line between shapes
         //
         // YOUR CODE HERE:
 
 
         // ── TASK 4 — Early Binding ────────────────────────────
-        // The line below calls toString() on an Animal reference
-        // pointing to a Dog object.
+        // The reference below has type Shape, but the object
+        // is a Rectangle at runtime.
         //
-        // Question: Which toString() runs — Animal's or Dog's?
-        // Write your answer as a comment on the next line.
+        // Q: When toString() is called on shapeRef, which class
+        //    version runs — Shape's or Rectangle's? Why?
         //
-        Animal earlyRef = new Dog("Rex", 5, "German Shepherd");
-        System.out.println(earlyRef.toString());
+        // Write your answer as a comment on the line marked ANSWER.
+        //
+        Shape shapeRef = new Rectangle("Green", true, 4.0, 9.0);
+        System.out.println(shapeRef.toString());
         // ANSWER: _______________________________________________
 
 
         // ── TASK 5 — Downcasting ─────────────────────────────
-        // a1 holds a Dog object but its type is Animal.
-        // You cannot call fetch() on it directly.
+        // s1 holds a Rectangle but its declared type is Shape.
+        // You cannot call getWidth() on s1 directly.
         //
-        // Step 1: Check if a1 is actually a Dog using instanceof.
-        // Step 2: Downcast a1 to a Dog.
-        // Step 3: Call fetch() on the downcasted variable.
+        // Step 1: Use instanceof to check s1 is a Rectangle.
+        // Step 2: Downcast s1 to a Rectangle variable called r.
+        // Step 3: Print r.getWidth() and r.getLength().
         //
         // YOUR CODE HERE:
 
 
-        // ── TASK 6 — Cannot instantiate abstract class ────────
-        // Uncomment the line below. What error do you get?
-        // Write the error message as a comment, then re-comment
-        // the line so your program compiles.
+        // ── TASK 6 — Abstract class restriction ───────────────
+        // Uncomment the line below. What compiler error appears?
+        // Write the error as a comment, then re-comment the line.
         //
-        // Animal x = new Animal("Ghost", 0, "Unknown");
+        // Shape s = new Shape("Black", false);
         // ERROR: ________________________________________________
 
+
+        // ── TASK 7 (Bonus) ────────────────────────────────────
+        // Write a static method called printShapeInfo that
+        // accepts a Shape parameter and prints its area and
+        // perimeter. Call it once with s1 and once with s2.
+        //
+        // Notice: the same method works for BOTH shape types
+        // without any if/else. This is called polymorphism.
+        //
+        // YOUR CODE HERE:
     }
+
+    // ── Bonus method stub ─────────────────────────────────────
+    // public static void printShapeInfo(Shape s) { ... }
 }
 ```
 
 ---
 
-## Expected Output
+## Sample Input and Output
+
+The program uses no keyboard input — all values are hardcoded in `main()`. The expected console output for the completed tasks is shown below.
+
+### Task 3 output — printing all shapes
 
 ```
-[ Dog ]
-Name   : Bruno
-Age    : 3 years
-Habitat: Land
-Breed  : Labrador
-Bruno says: Woof! Woof!
-Bruno runs on four legs.
+[ Rectangle ]
+Color : Red
+Filled: Yes
+Width : 5.0
+Length: 8.0
+Area      : 40.00
+Perimeter : 26.00
 
-[ Bird ]
-Name   : Tweety
-Age    : 1 years
-Habitat: Sky/Trees
-Can fly: Yes
-Tweety says: Tweet! Tweet!
-Tweety flies through the air.
-
-[ Fish ]
-Name   : Nemo
-Age    : 2 years
-Habitat: Water
-Water  : Saltwater
-Nemo blows bubbles silently.
-Nemo swims gracefully underwater.
-
-[ Dog ]
-Name   : Rex
-Age    : 5 years
-Habitat: Land
-Breed  : German Shepherd
-Bruno fetches the ball!
+[ Circle ]
+Color : Blue
+Filled: No
+Radius: 7.0
+Area         : 153.94
+Circumference: 43.98
 ```
+
+### Task 4 output — early binding test
+
+```
+[ Rectangle ]
+Color : Green
+Filled: Yes
+Width : 4.0
+Length: 9.0
+Area      : 36.00
+Perimeter : 26.00
+```
+
+> The `Shape` reference `shapeRef` points to a `Rectangle` object at runtime. Java's virtual method dispatch (late binding) calls `Rectangle.toString()` — not `Shape.toString()`. The declared type controls what methods you can *call*; the actual object type controls which version *runs*.
+
+### Task 5 output — downcasting
+
+```
+Downcasting s1 to Rectangle...
+Width : 5.0
+Length: 8.0
+```
+
+### Task 7 output — bonus polymorphism method
+
+```
+--- Shape Info ---
+Area     : 40.00
+Perimeter: 26.00
+
+--- Shape Info ---
+Area     : 153.94
+Perimeter: 43.98
+```
+
+---
+
+## Full Working Solution (check your work after attempting)
+
+<details>
+<summary>Click to reveal solution</summary>
+
+```java
+package shapes;
+
+public class ShapeMain {
+
+    public static void main(String[] args) {
+
+        // Task 1
+        Shape s1 = new Rectangle("Red",  true,  5.0, 8.0);
+        Shape s2 = new Circle(   "Blue", false, 7.0);
+
+        // Task 2
+        Shape[] shapes = { s1, s2 };
+
+        // Task 3
+        for (Shape s : shapes) {
+            System.out.println(s);
+            System.out.println();
+        }
+
+        // Task 4
+        Shape shapeRef = new Rectangle("Green", true, 4.0, 9.0);
+        System.out.println(shapeRef.toString());
+        // ANSWER: Rectangle's toString() runs. Even though shapeRef is
+        // declared as Shape, the object is a Rectangle at runtime.
+        // Java uses late binding (dynamic dispatch) for non-static,
+        // non-final methods, so the overridden version is always called.
+
+        // Task 5
+        if (s1 instanceof Rectangle) {
+            Rectangle r = (Rectangle) s1;   // downcast
+            System.out.println("Downcasting s1 to Rectangle...");
+            System.out.println("Width : " + r.getWidth());
+            System.out.println("Length: " + r.getLength());
+        }
+
+        // Task 6 — keep commented:
+        // Shape s = new Shape("Black", false);
+        // ERROR: Shape is abstract; cannot be instantiated
+
+        // Task 7
+        System.out.println("\n--- Shape Info ---");
+        printShapeInfo(s1);
+        System.out.println("\n--- Shape Info ---");
+        printShapeInfo(s2);
+    }
+
+    public static void printShapeInfo(Shape s) {
+        System.out.printf("Area     : %.2f%n", s.getArea());
+        System.out.printf("Perimeter: %.2f%n", s.getPerimeter());
+    }
+}
+```
+
+</details>
 
 ---
 
@@ -343,47 +415,43 @@ Bruno fetches the ball!
 
 ### Abstract class
 
-`Animal` is declared `abstract`, which means:
-
-- You **cannot** write `new Animal(...)` — the compiler forbids it.  
-- It may contain both abstract methods (no body) and concrete methods (with body).  
-- Its purpose is to define a **contract** that all subclasses must honour.
+`Shape` is declared `abstract`, so `new Shape(...)` causes a compile-time error. Its job is to define the *contract* — every shape must provide `getArea()` and `getPerimeter()` — without specifying *how* to compute them.
 
 ### Method overriding
 
-When `Dog` writes `@Override public void makeSound()`, it provides its own version. The `@Override` annotation is optional but strongly recommended — the compiler will catch typos in the method signature.
+When `Rectangle` writes `@Override public double getArea()`, it replaces `Shape`'s declaration with its own formula (`width * length`). Rules for a valid override:
 
-Rules for a valid override:
+- Same method name and parameter list.
+- Same or covariant return type.
+- Cannot reduce visibility (cannot change `public` to `private`).
 
-- Same method name, same parameter list.  
-- Return type must be the same or a subtype (covariant return).  
-- Cannot reduce visibility (e.g., cannot change `public` to `private`).
+The `@Override` annotation is optional but recommended — the compiler catches typos in the signature.
 
-### Early binding (`toString()`)
+### Early binding vs late binding
 
-In Java, **all method calls are resolved at runtime** through dynamic dispatch — *except* for `static`, `final`, and `private` methods, which are bound at compile time (early/static binding).
+In Java, `static`, `final`, and `private` methods use **early binding** — the exact method call is decided at compile time based on the reference type. All other methods (including `getArea()` and `toString()`) use **late binding (dynamic dispatch)** — the JVM checks the actual object type at runtime and calls the correct overridden version.
 
-However, `toString()` is interesting here as a teaching tool: when you call `System.out.println(earlyRef)`, the compiler knows at compile time that `earlyRef` has type `Animal` and that `Animal` has a `toString()`. But at **runtime**, because `earlyRef` actually points to a `Dog` object, Java's virtual method table dispatches to `Dog.toString()`. This is **late binding (dynamic dispatch)**.
+```java
+Shape s = new Rectangle("Red", true, 5, 8);
+s.getArea();     // ← calls Rectangle.getArea() at runtime (late binding)
+```
 
-> **Key takeaway:** Reference type determines what methods are *accessible* at compile time. Object type determines which version *runs* at runtime.
+The declared type `Shape` controls what method names are *accessible*. The runtime type `Rectangle` controls which *version* runs.
 
 ### Downcasting
 
 ```java
-// a1 is declared as Animal but holds a Dog object
-Animal a1 = new Dog("Bruno", 3, "Labrador");
+Shape s1 = new Rectangle("Red", true, 5.0, 8.0);
 
-// This line would NOT compile — Animal has no fetch() method:
-// a1.fetch();   ✗
+// s1.getWidth();   ← compile error: Shape has no getWidth()
 
-// Safe downcast:
-if (a1 instanceof Dog) {
-    Dog d = (Dog) a1;   // downcast
-    d.fetch();           // now accessible ✓
+if (s1 instanceof Rectangle) {
+    Rectangle r = (Rectangle) s1;  // downcast
+    r.getWidth();                   // now accessible
 }
 ```
 
-An unsafe cast (without `instanceof`) throws a `ClassCastException` at runtime if the object is not actually of that type. Always check first.
+Always use `instanceof` before downcasting. Without the check, an incorrect cast throws `ClassCastException` at runtime.
 
 ---
 
@@ -391,20 +459,19 @@ An unsafe cast (without `instanceof`) throws a `ClassCastException` at runtime i
 
 | Mistake | What happens |
 |---|---|
-| `new Animal(...)` | Compile error — cannot instantiate abstract class |
-| Forgetting `@Override` on `makeSound()` | Silently creates a new method instead of overriding — `makeSound()` on an `Animal` reference calls the abstract version and crashes |
-| Casting `a2` (Bird) to `Dog` | `ClassCastException` at runtime |
-| Calling `fetch()` on an `Animal` reference | Compile error — `fetch()` is not in `Animal` |
-| `toString()` not calling `super.toString()` | Subclass output loses `name`, `age`, and `habitat` |
+| `new Shape("Red", true)` | Compile error — cannot instantiate abstract class |
+| Forgetting `@Override` on `getArea()` | Silently creates a new method; the abstract version remains unimplemented, causing compile error |
+| `(Rectangle) s2` where `s2` holds a `Circle` | `ClassCastException` at runtime |
+| Calling `getWidth()` on a `Shape` reference | Compile error — `getWidth()` is not declared in `Shape` |
+| `toString()` not calling `super.toString()` | Output loses `color` and `filled` from the parent |
 
 ---
 
 ## Submission Checklist
 
-- [ ] `Animal.java` — abstract class with two abstract methods and `toString()`  
-- [ ] `Dog.java` — overrides `makeSound()`, `move()`, `toString()`; adds `fetch()`  
-- [ ] `Bird.java` — overrides `makeSound()`, `move()`, `toString()`; adds `sing()`  
-- [ ] `Fish.java` — overrides `makeSound()`, `move()`, `toString()`; adds `blowBubbles()`  
-- [ ] `ZooMain.java` — all six tasks completed with comments answered  
-- [ ] Program compiles with no errors  
-- [ ] Output matches the expected output above
+- [ ] `Shape.java` — abstract class with two abstract methods and `toString()`
+- [ ] `Rectangle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`; adds `getWidth()`, `getLength()`
+- [ ] `Circle.java` — overrides `getArea()`, `getPerimeter()`, `toString()`; adds `getRadius()`
+- [ ] `ShapeMain.java` — all seven tasks completed with comments answered
+- [ ] Output matches the sample output above (values rounded to 2 decimal places)
+- [ ] Program compiles with zero errors or warnings
